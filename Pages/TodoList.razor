@@ -1,0 +1,105 @@
+﻿@page "/"
+
+<div class="container todo-list">
+
+    @if (!string.IsNullOrWhiteSpace(validation))
+    {
+        <p class="alert alert-warning">
+            @validation
+        </p>
+    }
+
+    @if (todos.Count > 0)
+    {
+        <div class="options-container text-right">
+            <a class="option-btn mb-3" href="#" @onclick="ToggleEdit">@editText</a>
+        </div>
+        <div id="todoList" class="mat-box @editClass">
+            @foreach (var item in todos)
+            {
+                <div class="row d-flex align-items-stretch todo-item">
+                    <TodoItem isEditable="@isEditable" text="@item.Text" isComplete="@item.IsComplete" />
+                    <div class="todo-delete">
+                        <a href="#" @onclick="(() => RemoveTodo(item.ID))"><i class="fa fa-close"></i></a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <h3 class="inactive-text">You're all done for the day! :)</h3>
+    }
+    <div class="todo-input d-flex justify-content-center mat-box">
+        <div class="col-md-11">
+            <input type="text" @bind="newTodo" @oninput="ResetValidation" @onkeyup="AddTodoOnEnter" placeholder="Add new todo..." />
+        </div>
+        <div class="col-md-1">
+            <button @onclick="AddTodo"><i class="fa fa-plus"></i></button>
+        </div>
+    </div>
+</div>
+
+@code {
+    IList<Todo> todos = new List<Todo>();
+    private string newTodo;
+    private string validation;
+    private string inputValue;
+    private bool isEditable;
+    public string editClass;
+    private string editText = "EDIT";
+
+    protected override void OnInitialized()
+    {
+        todos.Add(new Todo { Text = "Wake up", IsComplete = false });
+    }
+
+    private void AddTodo()
+    {
+        if (!string.IsNullOrWhiteSpace(newTodo))
+        {
+            todos.Add(new Todo { ID = Guid.NewGuid(), Text = newTodo, IsComplete = false });
+            newTodo = string.Empty;
+        }
+        else
+        {
+            validation = "Planning on doing nothing are we? Try again!";
+        }
+    }
+
+    private void AddTodoOnEnter(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            AddTodo();
+        }
+    }
+
+    private void ResetValidation()
+    {
+        validation = string.Empty;
+        isEditable = true;
+        ToggleEdit();
+    }
+
+    private void ToggleEdit()
+    {
+        if (isEditable)
+        {
+            isEditable = false;
+            editClass = string.Empty;
+            editText = "EDIT";
+        }
+        else
+        {
+            isEditable = true;
+            editClass = "is-editable";
+            editText = "DONE";
+        }
+    }
+
+    private void RemoveTodo(Guid id)
+    {
+        todos.Remove(todos.First(x => x.ID == id));
+    }
+}

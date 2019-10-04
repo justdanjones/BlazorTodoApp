@@ -1,0 +1,24 @@
+﻿<div class="td-checkbox d-flex align-items-center justify-content-center @GetCheckboxState()">
+    <input type="checkbox" @bind="isComplete" />
+</div>
+
+@code {
+    [Parameter]
+    public bool isComplete { get; set; }
+
+    public string checkboxState = "";
+
+    public string GetCheckboxState()
+    {
+        if (isComplete)
+        {
+            checkboxState = "complete";
+        }
+        else
+        {
+            checkboxState = "";
+        }
+
+        return checkboxState;
+    }
+}
